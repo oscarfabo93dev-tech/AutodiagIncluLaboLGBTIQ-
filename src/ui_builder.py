@@ -18,15 +18,15 @@ def esc(x: str) -> str:
 def display_instructions(instructions_text: str) -> None:
     st.markdown(
         """
-    ## Cuestionario de autodiagnóstico en inclusión laboral LGBTIQ+ (Agencias de Empleo)
+    ## Cuestionario de autodiagnóstico en inclusión laboral LGBTIQ+ (Agencias y Bolsas de Empleo)
 
-    **Objetivo.** Este cuestionario permite evaluar, de forma rápida y estructurada, el nivel de madurez de su Agencia de Empleo en inclusión laboral de personas LGBTIQ+. Consta de **10 preguntas**, cada una con **tres opciones de respuesta** que describen prácticas o situaciones concretas.
+    **Objetivo.** Este cuestionario permite evaluar, de forma rápida y estructurada, el nivel de madurez de su Agencia o Bolsa de Empleo en inclusión laboral de personas LGBTIQ+. Consta de **10 preguntas**, cada una con **tres opciones de respuesta** que describen prácticas o situaciones concretas.
 
-    ### Cómo completarlo
+    ### ¿Cómo completarlo?
     1. **Lea** atentamente cada pregunta y sus tres opciones.  
     2. **Seleccione** en la columna **"Respuesta"** la opción que mejor describa la situación actual de su Agencia.  
     3. **Puntajes:** cada opción equivale a **3, 2 o 1** puntos; la suma es **automática**.  
-    4. Al finalizar, el **puntaje total** ubicará a su Agencia en uno de los **tres niveles**: **Inicial**, **Intermedio** o **Avanzado**.  
+    4. Al finalizar, el **puntaje total** ubicará a su agencia o bolsa de empleo en uno  de los **tres niveles**: **Inicial**, **Intermedio** o **Avanzado**.  
     5. Según el nivel, el sistema mostrará una **ruta de aprendizaje sugerida** con talleres y acciones formativas para fortalecer sus prácticas (consulte las **pestañas** correspondientes en este documento).
 
     > **Confidencialidad.** Este autodiagnóstico es **confidencial** y está diseñado para uso **interno** como insumo para la mejora continua y la planificación estratégica en **diversidad, equidad e inclusión**.
@@ -39,11 +39,32 @@ def display_instructions(instructions_text: str) -> None:
 
 def _radio_for_question(q: Dict[str, Any], idx: int) -> Tuple[int, str]:
     """
-    Render de una pregunta SIN cajas alrededor.
+    Render de una pregunta con la sección ENCIMA del enunciado.
+    - La sección (si existe) aparece ARRIBA como una nota sutil.
     - Enunciado en tipografía prominente.
-    - La sección (si existe) aparece DEBAJO del enunciado como una nota sutil.
     - Radios 3/2/1 en vertical.
     """
+    # Sección arriba del enunciado (sutil, gris claro)
+    section = q.get("section") or ""
+    if section:
+        st.markdown(
+            f"""
+            <div style="
+                display: inline-block;
+                font-size: 0.95rem;
+                color: #6b7280;         /* gris 500 */
+                background: #f3f4f6;    /* gris 100 */
+                border: 1px solid #e5e7eb; /* gris 200 */
+                padding: 0.35rem 0.6rem;
+                border-radius: 6px;
+                margin: 0 0 0.5rem 0;   /* margen inferior para separar del enunciado */
+            ">
+                {esc(section)}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     # Enunciado
     st.markdown(
         f"""
@@ -60,45 +81,21 @@ def _radio_for_question(q: Dict[str, Any], idx: int) -> Tuple[int, str]:
         unsafe_allow_html=True,
     )
 
-    # Sección debajo del enunciado (sutil, gris claro)
-    section = q.get("section") or ""
-    if section:
-        st.markdown(
-            f"""
-            <div style="
-                display: inline-block;
-                font-size: 0.95rem;
-                color: #6b7280;         /* gris 500 */
-                background: #f3f4f6;    /* gris 100 */
-                border: 1px solid #e5e7eb; /* gris 200 */
-                padding: 0.35rem 0.6rem;
-                border-radius: 6px;
-                margin: 0 0 0.75rem 0;
-            ">
-                {esc(section)}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
     # Opciones 3,2,1
     opts = sorted(q.get("options", []), key=lambda x: int(x["score"]), reverse=True)
-    labels = [
-        f"{esc(str(o.get('label','')))} (Puntuación: {int(o.get('score',0))})"
-        for o in opts
-    ]
+    # Mostrar solo el texto de la opción (sin "(Puntuación: X)")
+    labels = [esc(str(o.get("label", ""))) for o in opts]
 
     choice = st.radio(
         f"Seleccione una opción para la pregunta {esc(q.get('id',''))}:",
         options=list(range(len(opts))),
         format_func=lambda i: labels[i],
-        index=None,  # sin selección por defecto
+        index=None,
         key=f"q_{q.get('id','')}_{idx}_{st.session_state.get('_render_uid','0')}",
         horizontal=False,
-        label_visibility="collapsed",  # el contexto ya lo da el enunciado
+        label_visibility="collapsed",
     )
 
-    # Separador fino entre preguntas (no es caja)
     st.markdown('<div style="height: 1.0rem;"></div>', unsafe_allow_html=True)
 
     if choice is not None:
