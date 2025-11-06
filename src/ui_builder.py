@@ -18,19 +18,31 @@ def esc(x: str) -> str:
 def display_instructions(instructions_text: str) -> None:
     st.markdown(
         """
-    ## Cuestionario de autodiagnóstico en inclusión laboral LGBTIQ+ (Agencias y Bolsas de Empleo)
+    <div style="
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        color: #111827;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    ">
+    
+    ## Cuestionario de autodiagnóstico en inclusión laboral LGBTIQ+
 
-    **Objetivo.** Este cuestionario permite evaluar, de forma rápida y estructurada, el nivel de madurez de su Agencia o Bolsa de Empleo en inclusión laboral de personas LGBTIQ+. Consta de **10 preguntas**, cada una con **tres opciones de respuesta** que describen prácticas o situaciones concretas.
+    **Objetivo:** Este cuestionario permite evaluar, de forma rápida y estructurada, el nivel de madurez de su Agencia o Bolsa de Empleo en inclusión laboral de personas LGBTIQ+. Consta de 10 preguntas, cada una con tres opciones de respuesta que describen prácticas o situaciones concretas.
 
     ### ¿Cómo completarlo?
-    1. **Lea** atentamente cada pregunta y sus tres opciones.  
-    2. **Seleccione** en la columna **"Respuesta"** la opción que mejor describa la situación actual de su Agencia.  
-    3. **Puntajes:** cada opción equivale a **3, 2 o 1** puntos; la suma es **automática**.  
-    4. Al finalizar, el **puntaje total** ubicará a su agencia o bolsa de empleo en uno  de los **tres niveles**: **Inicial**, **Intermedio** o **Avanzado**.  
-    5. Según el nivel, el sistema mostrará una **ruta de aprendizaje sugerida** con talleres y acciones formativas para fortalecer sus prácticas (consulte las **pestañas** correspondientes en este documento).
+    1. Lea atentamente cada pregunta y sus tres opciones
+    2. Seleccione la opción que mejor describa su situación actual
+    3. Cada opción vale 3, 2 o 1 puntos (suma automática)
+    4. Al finalizar, obtendrá su nivel: Inicial, Intermedio o Avanzado
+    5. Recibirá una ruta de aprendizaje sugerida personalizada
 
-    > **Confidencialidad.** Este autodiagnóstico es **confidencial** y está diseñado para uso **interno** como insumo para la mejora continua y la planificación estratégica en **diversidad, equidad e inclusión**.
-    """
+    > **Confidencialidad:** Este autodiagnóstico es confidencial y está diseñado para uso interno como insumo para la mejora continua y la planificación estratégica en diversidad, equidad e inclusión.
+    
+    </div>
+    """,
+        unsafe_allow_html=True,
     )
 
 
@@ -39,25 +51,23 @@ def display_instructions(instructions_text: str) -> None:
 
 def _radio_for_question(q: Dict[str, Any], idx: int) -> Tuple[int, str]:
     """
-    Render de una pregunta con la sección ENCIMA del enunciado.
-    - La sección (si existe) aparece ARRIBA como una nota sutil.
-    - Enunciado en tipografía prominente.
-    - Radios 3/2/1 en vertical.
+    Render de una pregunta con diseño responsive mejorado.
     """
-    # Sección arriba del enunciado (sutil, gris claro)
+    # Sección arriba del enunciado
     section = q.get("section") or ""
     if section:
         st.markdown(
             f"""
             <div style="
                 display: inline-block;
-                font-size: 0.95rem;
-                color: #6b7280;         /* gris 500 */
-                background: #f3f4f6;    /* gris 100 */
-                border: 1px solid #e5e7eb; /* gris 200 */
-                padding: 0.35rem 0.6rem;
-                border-radius: 6px;
-                margin: 0 0 0.5rem 0;   /* margen inferior para separar del enunciado */
+                font-size: 0.9rem;
+                color: #6b7280;
+                background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+                border: 1px solid #d1d5db;
+                padding: 0.4rem 0.8rem;
+                border-radius: 8px;
+                margin: 0 0 0.75rem 0;
+                font-weight: 600;
             ">
                 {esc(section)}
             </div>
@@ -65,17 +75,19 @@ def _radio_for_question(q: Dict[str, Any], idx: int) -> Tuple[int, str]:
             unsafe_allow_html=True,
         )
 
-    # Enunciado
+    # Enunciado responsive
     st.markdown(
         f"""
         <div style="
-            font-size: 1.35rem;
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
             line-height: 1.6;
-            color: #111827;        /* gris 900 */
-            margin: 0.25rem 0 0.25rem 0;
+            color: #111827;
+            background-color: #ffffff;
+            margin: 0.5rem 0 1rem 0;
             font-weight: 700;
+            padding: 0.5rem 0;
         ">
-            {esc(q.get('text', ''))}
+            <span style="color: #667eea; font-weight: 800;">{esc(q.get('id', ''))}.</span> {esc(q.get('text', ''))}
         </div>
         """,
         unsafe_allow_html=True,
@@ -83,7 +95,6 @@ def _radio_for_question(q: Dict[str, Any], idx: int) -> Tuple[int, str]:
 
     # Opciones 3,2,1
     opts = sorted(q.get("options", []), key=lambda x: int(x["score"]), reverse=True)
-    # Mostrar solo el texto de la opción (sin "(Puntuación: X)")
     labels = [esc(str(o.get("label", ""))) for o in opts]
 
     choice = st.radio(
@@ -96,7 +107,10 @@ def _radio_for_question(q: Dict[str, Any], idx: int) -> Tuple[int, str]:
         label_visibility="collapsed",
     )
 
-    st.markdown('<div style="height: 1.0rem;"></div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div style="height: 1.5rem; border-bottom: 1px solid #e5e7eb; margin: 1rem 0;"></div>',
+        unsafe_allow_html=True,
+    )
 
     if choice is not None:
         chosen = opts[choice]
@@ -109,9 +123,8 @@ def build_quiz_form(
     questions: List[Dict[str, Any]], show_missing_hint: bool = False
 ) -> Tuple[Dict[str, int], Dict[str, str]]:
     """
-    Pinta todas las preguntas. Añade barra de progreso sticky (sin mover tu botón).
+    Pinta todas las preguntas con barra de progreso LGBTI.
     """
-    # Unique render id to avoid duplicate Streamlit keys when re-rendering with hints
     _ = st.session_state.setdefault("_render_uid", str(uuid4()))
 
     answers: Dict[str, int] = {}
@@ -125,11 +138,15 @@ def build_quiz_form(
             labels[q["id"]] = label
             completed_questions += 1
         elif show_missing_hint:
-            st.warning(f"Falta responder la pregunta {q.get('id','?')}.", icon="⚠️")
+            st.warning(f"Falta responder la pregunta **{q.get('id','?')}**")
 
-    # ---- Sticky footer: SOLO barra de progreso (mantén tu botón en app.py) ----
+    # Barra de progreso con colores de la bandera LGBTI
     if len(questions) > 0:
         progress = completed_questions / len(questions)
+
+        # Gradiente de la bandera LGBTI
+        lgbti_gradient = "linear-gradient(to right, #E40303 0%, #FF8C00 16.67%, #FFED00 33.33%, #008026 50%, #24408E 66.67%, #732982 83.33%, #732982 100%)"
+
         st.markdown(
             f"""
             <div style="
@@ -137,32 +154,41 @@ def build_quiz_form(
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: #ffffff;
-                padding: 0.9rem 1.25rem;
-                border-top: 1px solid #e5e7eb;
-                box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+                background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.98) 100%);
+                padding: clamp(0.75rem, 2vw, 1.25rem);
+                border-top: 2px solid #e5e7eb;
+                box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
                 z-index: 999;
+                backdrop-filter: blur(10px);
             ">
                 <div style="max-width: 1200px; margin: 0 auto;">
                     <div style="
-                        height: 10px;
+                        height: 14px;
                         background-color: #e5e7eb;
                         border-radius: 999px;
                         overflow: hidden;
+                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
                     ">
                         <div style="
                             height: 100%;
                             width: {progress * 100}%;
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            transition: width 0.25s ease;
+                            background: {lgbti_gradient};
+                            transition: width 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+                            box-shadow: 0 0 12px rgba(0,0,0,0.15);
                         "></div>
                     </div>
-                    <div style="margin-top: 0.4rem; color: #6b7280; font-size: 0.92rem; text-align:center;">
-                            Progreso: {completed_questions} de {len(questions)} preguntas completadas{'' if completed_questions==len(questions) else f' · Te faltan {len(questions)-completed_questions}'}
+                    <div style="
+                        margin-top: 0.5rem;
+                        color: #374151;
+                        font-size: clamp(0.85rem, 2vw, 1rem);
+                        text-align: center;
+                        font-weight: 600;
+                    ">
+                        {'Completado' if completed_questions == len(questions) else f'Progreso: {completed_questions}/{len(questions)} preguntas · Faltan {len(questions)-completed_questions}'}
                     </div>
                 </div>
             </div>
-            <div style="height: 80px;"></div>  <!-- espaciador para que el contenido no quede tapado -->
+            <div style="height: clamp(70px, 15vw, 90px);"></div>
             """,
             unsafe_allow_html=True,
         )
@@ -176,14 +202,28 @@ def build_quiz_form(
 def show_result(
     result: Dict[str, Any],
     levels: Dict[str, Dict[str, str]],
-    recommendations: pd.DataFrame,  # se ignora (por solicitud), pero mantenemos la firma pública
+    recommendations: pd.DataFrame,
     areas: Dict[str, int],
 ) -> None:
-    # Encabezado del bloque de resultados
+    # Encabezado responsive y centrado
     st.markdown(
         """
-    <div style="max-width: 1200px; margin: 2rem auto 0.5rem auto; text-align: center;">
-        <h2 style="color: #111827; font-size: 2.1rem; font-weight: 700; margin: 0;">
+    <div style="
+        max-width: 800px;
+        margin: 2rem auto 1rem auto;
+        text-align: center;
+        background-color: #ffffff;
+    ">
+        <h2 style="
+            color: #111827;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        ">
             Resultados del diagnóstico
         </h2>
     </div>
@@ -191,24 +231,33 @@ def show_result(
         unsafe_allow_html=True,
     )
 
-    # Tarjeta principal con gradiente (misma gama)
+    # Tarjeta principal responsive y centrada
     st.markdown(
         f"""
     <div style="
-        max-width: 900px;
-        margin: 1rem auto 2rem auto;
-        padding: 2.2rem;
-        border-radius: 14px;
+        max-width: 800px;
+        margin: 1.5rem auto 2rem auto;
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        border-radius: 16px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         text-align: center;
-        box-shadow: 0 8px 28px rgba(102, 126, 234, 0.30);
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.35);
+        animation: fadeIn 0.5s ease;
     ">
-        <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.35rem;">
+        <div style="
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        ">
             {esc(result['level_label'])}
         </div>
-        <div style="font-size: 1.15rem; font-weight: 500; opacity: 0.95;">
-            Puntaje total: {int(result['total'])}
+        <div style="
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            font-weight: 600;
+            opacity: 0.95;
+        ">
+            Puntaje total: {int(result['total'])} puntos
         </div>
     </div>
     """,
@@ -218,29 +267,38 @@ def show_result(
     lv_key = result["level_key"]
     lv = levels.get(lv_key, {})
 
-    # Bloques apilados (no columnas)
+    # Cards más anchas y centradas
     def _card(title: str, color: str, text: str) -> None:
         st.markdown(
             f"""
             <div style="
-                max-width: 1000px;
-                margin: 1.1rem auto;
-                padding: 1.25rem 1.35rem;
-                border-radius: 10px;
+                max-width: 800px;
+                margin: 1.5rem auto;
+                padding: clamp(1.25rem, 3vw, 2rem);
+                border-radius: 12px;
                 background: #ffffff;
-                border: 1px solid #e5e7eb;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+                border: 2px solid {color}30;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
             ">
                 <div style="
                     color: {color};
                     font-weight: 700;
-                    font-size: 1.2rem;
-                    margin-bottom: 0.6rem;
+                    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+                    margin-bottom: 1rem;
                     border-bottom: 3px solid {color};
                     width: fit-content;
-                    padding-bottom: 0.15rem;
+                    padding-bottom: 0.35rem;
+                    padding-right: 0.75rem;
                 ">{esc(title)}</div>
-                <div style="line-height: 1.65; color: #374151; font-size: 1.05rem;">
+                <div style="
+                    line-height: 1.8;
+                    color: #374151;
+                    font-size: clamp(1rem, 2vw, 1.15rem);
+                    background-color: #ffffff;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                ">
                     {esc(text)}
                 </div>
             </div>
@@ -249,45 +307,79 @@ def show_result(
         )
 
     if lv:
-        _card("Definición", "#667eea", lv.get("DEFINICION", "(sin definición)"))
+        _card(
+            "Definición",
+            "#667eea",
+            lv.get("DEFINICION", "(sin definición)"),
+        )
         _card(
             "Características",
             "#764ba2",
             lv.get("CARACTERISTICAS", "(sin características)"),
         )
-        _card("Ruta de aprendizaje", "#28a745", lv.get("RUTA", "(sin ruta)"))
+        _card(
+            "Ruta de aprendizaje",
+            "#28a745",
+            lv.get("RUTA", "(sin ruta)"),
+        )
 
-    # Áreas a fortalecer
+    # Áreas a fortalecer - VERTICALES y centradas
     if areas:
+        # Contenedor principal centrado
         st.markdown(
             """
-        <div style="max-width: 1000px; margin: 2rem auto 0.5rem auto;">
-            <h3 style="color:#111827; font-size:1.45rem; font-weight:700; margin:0 0 0.75rem 0;">
+        <div style="
+            max-width: 800px;
+            margin: 2.5rem auto 1.5rem auto;
+            background-color: #ffffff;
+        ">
+            <h3 style="
+                color:#111827;
+                font-size: clamp(1.3rem, 3vw, 1.6rem);
+                font-weight:700;
+                margin:0 0 0.5rem 0;
+            ">
                 Áreas a fortalecer
             </h3>
-            <div style="color:#6b7280; margin-bottom: 0.75rem;">
-                Secciones donde se eligieron opciones 1 o 2:
+            <div style="
+                color:#6b7280;
+                margin-bottom: 1.5rem;
+                font-size: clamp(0.9rem, 2vw, 1rem);
+            ">
+                Secciones donde se eligieron opciones de puntaje bajo:
             </div>
-        </div>
         """,
             unsafe_allow_html=True,
         )
-    cols = st.columns(3)
-    for i, (sec, sc) in enumerate(areas.items()):
-        with cols[i % 3]:
+
+        # Layout vertical (una card debajo de otra) - centrado
+        for sec, sc in areas.items():
             st.markdown(
                 f"""
             <div style="
-                padding: 0.9rem 1rem;
-                margin: 0.4rem 0;
-                border-radius: 8px;
+                max-width: 800px;
+                margin: 0 auto 0.75rem auto;
+                padding: clamp(1rem, 2.5vw, 1.5rem);
+                border-radius: 10px;
                 background: linear-gradient(145deg, #fff3cd 0%, #ffeaa7 100%);
-                border: 1px solid #f1c40f;
-                box-shadow: 0 2px 8px rgba(241, 196, 15, 0.18);
+                border: 2px solid #f1c40f;
+                box-shadow: 0 3px 12px rgba(241, 196, 15, 0.2);
+                transition: transform 0.2s ease;
             ">
-                <div style="color:#7a5d00; font-weight:700; margin-bottom:0.15rem;">{esc(sec)}</div>
-                <div style="color:#7a5d00; font-size:0.92rem;">Puntaje ≤ {int(sc)}</div>
+                <div style="
+                    color:#7a5d00;
+                    font-weight:700;
+                    margin-bottom:0.5rem;
+                    font-size: clamp(1rem, 2.2vw, 1.2rem);
+                ">{esc(sec)}</div>
+                <div style="
+                    color:#7a5d00;
+                    font-size: clamp(0.9rem, 1.9vw, 1rem);
+                ">Puntaje ≤ {int(sc)}</div>
             </div>
             """,
                 unsafe_allow_html=True,
             )
+
+        # Cerrar contenedor principal
+        st.markdown("</div>", unsafe_allow_html=True)
