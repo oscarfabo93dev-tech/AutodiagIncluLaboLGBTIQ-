@@ -546,7 +546,7 @@ def main():
     st.markdown(
         """
         <div style="text-align: center; color: var(--text-light); font-size: 0.9rem; padding: 1rem 0;">
-            <p>Desarrollado con compromiso por la inclusión | © 2024</p>
+            <p>Desarrollado con compromiso por la inclusión | © 2025</p>
             <p style="font-size: 0.8rem; margin-top: 0.5rem;">
                 Este diagnóstico es confidencial y está diseñado para uso interno
             </p>
